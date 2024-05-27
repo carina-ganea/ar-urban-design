@@ -11,7 +11,24 @@ namespace Google.XR.ARCoreExtensions.Samples.PersistentCloudAnchors
         void Start()
         {
             Manager = FindAnyObjectByType<ARViewManager>();
+            if( Manager != null )
+            {
+                Debug.Log("Found AR Anchor Manager");
+            }
+            else
+            { 
+                Debug.Log("Not Found AR Anchor Manager");
+            }
             Controller = FindAnyObjectByType<PersistentCloudAnchorsController>();
+
+            if (Controller != null)
+            {
+                Debug.Log("Found AR Anchor Controller");
+            }
+            else
+            {
+                Debug.Log("Not Found AR Anchor Controller");
+            }
         }
 
         public void OnHostButtonClicked()

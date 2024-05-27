@@ -203,6 +203,10 @@ namespace Google.XR.ARCoreExtensions.Samples.PersistentCloudAnchors
         /// </summary>
         public void OnResolveButtonClicked()
         {
+            foreach (var obj in GameObject.FindGameObjectsWithTag("Spawned"))
+            {
+                Destroy(obj);
+            }
             Mode = ApplicationMode.Resolving;
             SwitchToResolveMenu();
         }

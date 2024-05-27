@@ -6,6 +6,8 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Utilities.Internal;
 using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 using Unity.XR.CoreUtils;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
 {
@@ -199,6 +201,16 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
 
                 if (m_RequireHorizontalUpSurface && arPlane.alignment != PlaneAlignment.HorizontalUp)
                     return;
+
+                // Ignore the touch if it's pointing on UI objects.
+                Touch touch; 
+                if(Input.touchCount >= 1 && (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
+                {
+                    if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                    {
+                        return;
+                    }
+                }
 
                 m_ObjectSpawner.TrySpawnObject(arRaycastHit.pose.position, arPlane.normal);
             }
