@@ -1,5 +1,43 @@
 {
   "dependencies": {
+    "com.aukilabs.unity.ark": {
+      "version": "0.6.14",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.mathematics": "1.2.6",
+        "com.aukilabs.unity.ceres": "0.0.4"
+      },
+      "url": "https://npm.aukiverse.com"
+    },
+    "com.aukilabs.unity.ceres": {
+      "version": "0.0.4",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://npm.aukiverse.com"
+    },
+    "com.aukilabs.unity.conjurekit": {
+      "version": "0.6.82",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "url": "https://npm.aukiverse.com"
+    },
+    "com.aukilabs.unity.manna": {
+      "version": "0.6.98",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.aukilabs.unity.conjurekit": "0.6.82",
+        "com.aukilabs.unity.ark": "0.6.14",
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.mathematics": "1.2.6"
+      },
+      "url": "https://npm.aukiverse.com"
+    },
     "com.google.ar.core.arfoundation.extensions": {
       "version": "https://github.com/google-ar/arcore-unity-extensions.git",
       "depth": 0,
@@ -95,6 +133,13 @@
     "com.unity.mobile.android-logcat": {
       "version": "1.3.2",
       "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.1",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
