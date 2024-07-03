@@ -8,6 +8,8 @@ using UnityEngine.UI;
 using Auki.Util;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Utilities.Internal;
 
 public class ConjureKitManager : MonoBehaviour
 {
@@ -25,10 +27,22 @@ public class ConjureKitManager : MonoBehaviour
     [SerializeField] private bool _qrCodeBool;
     [SerializeField] private Button _qrCodeButton;
 
+    [SerializeField]
+    [RequireInterface(typeof(IARInteractor))]
+    [Tooltip("The AR Interactor that determines where to spawn the object.")]
+    Object m_ARInteractorObject;
+
+    XRBaseControllerInteractor m_ARInteractorAsControllerInteractor;
+
     private ARCameraManager arCameraManager;
     private Texture2D _videoTexture;
+
+    private GameObject m_lastSelected;
     void Start()
     {
+        m_ARInteractorAsControllerInteractor = m_ARInteractorObject as XRBaseControllerInteractor;
+        m_lastSelected = null;
+
         arCameraManager = _camera.GetComponent<ARCameraManager>();
 
         _conjureKit = new ConjureKit(
@@ -40,7 +54,11 @@ public class ConjureKitManager : MonoBehaviour
         _conjureKit.OnStateChanged += state =>
         {
             sessionState.text = state.ToString();
-            ToggleControls(state == State.Calibrated);
+            if(state == State.Calibrated)
+            {
+                ToggleControls(state == State.Calibrated);
+            }
+            
         };
 
         _conjureKit.OnJoined += session =>
@@ -66,6 +84,15 @@ public class ConjureKitManager : MonoBehaviour
     private void Update()
     {
         FeedMannaWithVideoFrames();
+
+        if (m_ARInteractorAsControllerInteractor.hasSelection)
+        {
+            var selected = m_ARInteractorAsControllerInteractor.interactablesSelected;
+            foreach (var interactable in selected)
+            {
+                m_lastSelected = interactable.transform.gameObject;
+            }
+        }
     }
 
     private void FeedMannaWithVideoFrames()
@@ -116,21 +143,25 @@ public class ConjureKitManager : MonoBehaviour
 
     public void CreateCubeEntity()
     {
-        if(_conjureKit.GetState() != State.Calibrated)
+        if(_conjureKit.GetState() != State.Calibrated && _conjureKit.GetState() != State.JoinedSession)
         {
             return;
         }
 
-        Vector3 position = _camera.transform.position + _camera.transform.forward * 0.5f;
-        Quaternion rotation = Quaternion.Euler(0, _camera.transform.eulerAngles.y, 0);
+        if( m_lastSelected)
+        {
+            Vector3 position = m_lastSelected.transform.localPosition;
+            Quaternion rotation = m_lastSelected.transform.localRotation;
 
-        Pose entityPose = new Pose(position, rotation);
+            Pose entityPose = new Pose(position, rotation);
 
-        _conjureKit.GetSession().AddEntity(
-            entityPose,
-            onComplete: entity => CreateCube(entity),
-            onError: error => Debug.Log(error)
-            );
+            _conjureKit.GetSession().AddEntity(
+                entityPose,
+                onComplete: entity => CreateCube(entity),
+                onError: error => Debug.Log(error)
+                );
+        }
+
     }
 
     public void CreateCubeEntity(Vector3 position, Quaternion rotation)
@@ -151,7 +182,12 @@ public class ConjureKitManager : MonoBehaviour
 
     private void CreateCube(Entity entity)
     {
-        if(entity.Flag == EntityFlag.EntityFlagParticipantEntity)
+        if (_conjureKit.GetState() != State.JoinedSession)
+        {
+            return;
+        }
+
+        if (entity.Flag == EntityFlag.EntityFlagParticipantEntity)
         {
             return;
         }

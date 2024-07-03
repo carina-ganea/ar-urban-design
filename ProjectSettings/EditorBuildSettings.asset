@@ -5,12 +5,15 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 4755b35b590504809a7525fd2109c2e2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/ARCore Extensions/1.43.0/Persistent Cloud Anchor Sample/Scenes/PersistentCloudAnchorsArf5.unity
     guid: 420f30d1cdc9e49498b3e1673b58e382
+  - enabled: 0
+    path: Assets/Samples/ConjureKit Demo/Scenes/ConjureKitScene.unity
+    guid: ffba87cf6a0e35a47881d1f119e54fb1
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6ee72d15cf39dd748a13eac57397b9af,
       type: 2}

@@ -146,6 +146,12 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
             set => m_SpawnAsChildren = value;
         }
 
+        [SerializeField]
+        [Tooltip("Whether spawned objects should be hosted using ConjureKit.")]
+        bool m_UsingConjureKit;
+
+        private ConjureKitManager m_ConjureKitManager;
+
         /// <summary>
         /// Event invoked after an object is spawned.
         /// </summary>
@@ -230,6 +236,9 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                 visualizationTrans.rotation = newObject.transform.rotation;
             }
 
+            //m_ConjureKitManager.CreateCubeEntity(spawnPoint, Quaternion.LookRotation(projectedForward, spawnNormal));
+
+            m_ConjureKitManager.CreateCubeEntity(newObject.transform.position, newObject.transform.rotation);
             objectSpawned?.Invoke(newObject);
             return true;
         }

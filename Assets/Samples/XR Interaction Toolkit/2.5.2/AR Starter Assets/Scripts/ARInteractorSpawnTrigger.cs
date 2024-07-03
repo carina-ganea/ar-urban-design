@@ -179,10 +179,13 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
             {
                 case SpawnTriggerType.SelectAttempt:
                     var currentControllerState = m_ARInteractorAsControllerInteractor.xrController.currentControllerState;
+
                     if (currentControllerState.selectInteractionState.activatedThisFrame)
                         m_EverHadSelection = m_ARInteractorAsControllerInteractor.hasSelection;
+
                     else if (currentControllerState.selectInteractionState.active)
                         m_EverHadSelection |= m_ARInteractorAsControllerInteractor.hasSelection;
+
                     else if (currentControllerState.selectInteractionState.deactivatedThisFrame)
                         attemptSpawn = !m_ARInteractorAsControllerInteractor.hasSelection && !m_EverHadSelection;
                     break;
