@@ -158,22 +158,6 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
         /// </summary>
         void Update()
         {
-            if(m_ARInteractorAsControllerInteractor.hasSelection)
-            {
-                var selected = m_ARInteractorAsControllerInteractor.interactablesSelected;
-
-                foreach (var obj in FindObjectsOfType<XRGrabInteractable>())
-                {
-                    obj.transform.Find("Canvas").gameObject.SetActive(false);
-                }
-
-                foreach (var interactable in selected)
-                {
-                    interactable.transform.Find("Canvas").gameObject.SetActive(true);
-                    interactable.transform.Find("Canvas").LookAt(objectSpawner.transform.position);
-                }
-            }
-
             var attemptSpawn = false;
             switch (m_SpawnTriggerType)
             {
@@ -205,14 +189,11 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
                 if (m_RequireHorizontalUpSurface && arPlane.alignment != PlaneAlignment.HorizontalUp)
                     return;
 
-                // Ignore the touch if it's pointing on UI objects.
+                // Only spawn when the touch begins
                 Touch touch; 
                 if(Input.touchCount >= 1 && (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
                 {
-                    if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 m_ObjectSpawner.TrySpawnObject(arRaycastHit.pose.position, arPlane.normal);

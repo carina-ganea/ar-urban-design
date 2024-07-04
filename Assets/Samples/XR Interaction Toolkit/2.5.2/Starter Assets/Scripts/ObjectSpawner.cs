@@ -57,7 +57,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         [SerializeField]
         [Tooltip("The index of the prefab to spawn. If outside the range of the list, this behavior will select " +
             "a random object each time it spawns.")]
-        int m_SpawnOptionIndex = -1;
+        public int m_SpawnOptionIndex = -1;
 
         /// <summary>
         /// The index of the prefab to spawn. If outside the range of <see cref="objectPrefabs"/>, this behavior will
@@ -236,9 +236,6 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                 visualizationTrans.rotation = newObject.transform.rotation;
             }
 
-            //m_ConjureKitManager.CreateCubeEntity(spawnPoint, Quaternion.LookRotation(projectedForward, spawnNormal));
-
-            m_ConjureKitManager.CreateCubeEntity(newObject.transform.position, newObject.transform.rotation);
             objectSpawned?.Invoke(newObject);
             return true;
         }

@@ -10,6 +10,7 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Utilities.Internal;
+using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 
 public class ConjureKitManager : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class ConjureKitManager : MonoBehaviour
 
     [SerializeField] private bool _qrCodeBool;
     [SerializeField] private Button _qrCodeButton;
+
+    [SerializeField] private ObjectSpawner m_objectSpawner;
 
     [SerializeField]
     [RequireInterface(typeof(IARInteractor))]
@@ -54,10 +57,6 @@ public class ConjureKitManager : MonoBehaviour
         _conjureKit.OnStateChanged += state =>
         {
             sessionState.text = state.ToString();
-            if(state == State.Calibrated)
-            {
-                ToggleControls(state == State.Calibrated);
-            }
             
         };
 
@@ -143,7 +142,7 @@ public class ConjureKitManager : MonoBehaviour
 
     public void CreateCubeEntity()
     {
-        if(_conjureKit.GetState() != State.Calibrated && _conjureKit.GetState() != State.JoinedSession)
+        if(_conjureKit.GetState() != State.Calibrated)
         {
             return;
         }
@@ -155,34 +154,32 @@ public class ConjureKitManager : MonoBehaviour
 
             Pose entityPose = new Pose(position, rotation);
 
+            foreach (var participant in GameObject.FindGameObjectsWithTag("Participant"))
+            {
+                Debug.Log("Participant: " + participant.name);
+                if (participant.GetComponent<ParticipantNetwork>().IsOwner)
+                {
+                    Debug.Log("Participant: " + participant.GetComponent<ParticipantNetwork>().NetworkBehaviourId.ToString());
+                    participant.GetComponent<ParticipantNetwork>().m_ObjectIndex.Value = m_objectSpawner.m_SpawnOptionIndex;
+                }
+            }
+
             _conjureKit.GetSession().AddEntity(
                 entityPose,
-                onComplete: entity => CreateCube(entity),
+                onComplete: entity => HostSuccess(),
                 onError: error => Debug.Log(error)
                 );
         }
 
     }
 
-    public void CreateCubeEntity(Vector3 position, Quaternion rotation)
+    private void HostSuccess()
     {
-        if (_conjureKit.GetState() != State.Calibrated)
-        {
-            return;
-        }
-
-        Pose entityPose = new Pose(position, rotation);
-
-        _conjureKit.GetSession().AddEntity(
-            entityPose,
-            onComplete: entity => CreateCube(entity),
-            onError: error => Debug.Log(error)
-            );
+        Debug.Log("Successfully hosted entity");
     }
-
     private void CreateCube(Entity entity)
     {
-        if (_conjureKit.GetState() != State.JoinedSession)
+        if (_conjureKit.GetState() != State.Calibrated)
         {
             return;
         }
@@ -193,6 +190,27 @@ public class ConjureKitManager : MonoBehaviour
         }
 
         var pose = _conjureKit.GetSession().GetEntityPose(entity);
-        Instantiate(_cube, pose.position, pose.rotation);
+
+        var index = -1;
+
+        foreach ( var participant in GameObject.FindGameObjectsWithTag("Participant"))
+        {
+            Debug.Log("Participant: " + participant.name);
+            if( !participant.GetComponent<ParticipantNetwork>().IsOwner) 
+            {
+                Debug.Log("Propagating Participant: " + participant.GetComponent<ParticipantNetwork>().NetworkBehaviourId.ToString());
+                index = participant.GetComponent<ParticipantNetwork>().m_ObjectIndex.Value;
+            }
+        }
+
+        if(index >= 0 && index <= 4)
+        {
+            Instantiate(m_objectSpawner.objectPrefabs[index], pose.position, pose.rotation);
+        }
+        else
+        {
+            Instantiate(m_objectSpawner.objectPrefabs[0], pose.position, pose.rotation);
+        }
+        
     }
 }

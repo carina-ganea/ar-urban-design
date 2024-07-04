@@ -4926,6 +4926,7 @@ MonoBehaviour:
   m_ApplyRandomAngleAtSpawn: 1
   m_SpawnAngleRange: 45
   m_SpawnAsChildren: 1
+  m_UsingConjureKit: 0
 --- !u!4 &1477894630
 Transform:
   m_ObjectHideFlags: 0
