@@ -157,10 +157,10 @@ public class ConjureKitManager : MonoBehaviour
             foreach (var participant in GameObject.FindGameObjectsWithTag("Participant"))
             {
                 Debug.Log("Participant: " + participant.name);
-                if (participant.GetComponent<ParticipantNetwork>().IsOwner)
+                if (participant.GetComponent<NetworkParticipant>().IsOwner)
                 {
-                    Debug.Log("Participant: " + participant.GetComponent<ParticipantNetwork>().NetworkBehaviourId.ToString());
-                    participant.GetComponent<ParticipantNetwork>().m_ObjectIndex.Value = m_objectSpawner.m_SpawnOptionIndex;
+                    Debug.Log("Participant: " + participant.GetComponent<NetworkParticipant>().NetworkBehaviourId.ToString());
+                    participant.GetComponent<NetworkParticipant>().m_ObjectIndex.Value = m_objectSpawner.m_SpawnOptionIndex;
                 }
             }
 
@@ -196,10 +196,10 @@ public class ConjureKitManager : MonoBehaviour
         foreach ( var participant in GameObject.FindGameObjectsWithTag("Participant"))
         {
             Debug.Log("Participant: " + participant.name);
-            if( !participant.GetComponent<ParticipantNetwork>().IsOwner) 
+            if( !participant.GetComponent<NetworkParticipant>().IsOwner) 
             {
-                Debug.Log("Propagating Participant: " + participant.GetComponent<ParticipantNetwork>().NetworkBehaviourId.ToString());
-                index = participant.GetComponent<ParticipantNetwork>().m_ObjectIndex.Value;
+                Debug.Log("Propagating Participant: " + participant.GetComponent<NetworkParticipant>().NetworkBehaviourId.ToString());
+                index = participant.GetComponent<NetworkParticipant>().m_ObjectIndex.Value;
             }
         }
 

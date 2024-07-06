@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine.XR.Interaction.Toolkit.Utilities;
 
 namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
@@ -146,17 +147,11 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
             set => m_SpawnAsChildren = value;
         }
 
-        [SerializeField]
-        [Tooltip("Whether spawned objects should be hosted using ConjureKit.")]
-        bool m_UsingConjureKit;
-
-        private ConjureKitManager m_ConjureKitManager;
-
         /// <summary>
         /// Event invoked after an object is spawned.
         /// </summary>
         /// <seealso cref="TrySpawnObject"/>
-        public event Action<GameObject> objectSpawned;
+        public event Action<int, Vector3, Quaternion> objectSpawned;
 
         /// <summary>
         /// See <see cref="MonoBehaviour"/>.
@@ -236,7 +231,11 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                 visualizationTrans.rotation = newObject.transform.rotation;
             }
 
-            objectSpawned?.Invoke(newObject);
+            objectSpawned?.Invoke(spawnOptionIndex, spawnPoint, newObject.transform.rotation);
+            if(NetworkManager.Singleton.IsConnectedClient)
+            {
+                Destroy(newObject);
+            }
             return true;
         }
     }

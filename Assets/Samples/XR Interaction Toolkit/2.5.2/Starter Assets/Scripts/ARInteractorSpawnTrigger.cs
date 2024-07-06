@@ -8,6 +8,8 @@ using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 using Unity.XR.CoreUtils;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
+using Unity.Netcode;
+using System;
 
 namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
 {
@@ -137,6 +139,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
             }
         }
 
+        public event Action<ulong, ulong> objectSelected;
+
         /// <summary>
         /// See <see cref="MonoBehaviour"/>.
         /// </summary>
@@ -178,6 +182,15 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
                     if (m_SpawnAction.action.WasPerformedThisFrame())
                         attemptSpawn = true;
                     break;
+            }
+
+            if(!attemptSpawn && m_ARInteractorAsControllerInteractor.hasSelection)
+            {
+                var objectId = m_ARInteractorAsControllerInteractor.interactablesSelected[0].transform.GetComponent<NetworkObject>().NetworkObjectId;
+
+                ulong participantId = NetworkManager.Singleton.LocalClientId;
+
+                objectSelected?.Invoke(participantId, objectId);
             }
 
             if (attemptSpawn && m_ARInteractor.TryGetCurrentARRaycastHit(out var arRaycastHit))
