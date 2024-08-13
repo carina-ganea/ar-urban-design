@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Spawned
   - Participant
+  - Ground
+  - Instructions
   layers:
   - Default
   - TransparentFX
@@ -13,7 +15,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Spawned
   - 
   - 
   - 

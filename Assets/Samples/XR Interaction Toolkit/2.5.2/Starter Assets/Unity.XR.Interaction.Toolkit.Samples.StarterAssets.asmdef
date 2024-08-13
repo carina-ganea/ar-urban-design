@@ -4,14 +4,17 @@
     "references": [
         "Unity.InputSystem",
         "Unity.Mathematics",
-        "Unity.XR.CoreUtils",
-        "Unity.XR.Interaction.Toolkit",
         "Unity.TextMeshPro",
-        "Unity.XR.ARFoundation",
-        "Unity.XR.ARSubsystems",
         "Unity.Netcode.Components",
         "Unity.Netcode.Editor",
-        "Unity.Netcode.Runtime"
+        "Unity.Netcode.Runtime",
+        "NativeGallery.Editor",
+        "NativeGallery.Runtime",
+        "Google.XR.ARCoreExtensions",
+        "Google.XR.ARCoreExtensions.GeospatialCreator",
+        "Google.XR.ARCoreExtensions.GeospatialCreator.Editor",
+        "Unity.XR.ARFoundation",
+        "Unity.XR.ARSubsystems"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -20,7 +23,7 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-        "versionDefines": [
+    "versionDefines": [
         {
             "name": "com.unity.xr.arfoundation",
             "expression": "4.2.7",
