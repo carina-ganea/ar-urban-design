@@ -168,6 +168,9 @@ public class ObjectSpawner : MonoBehaviour
     /// <seealso cref="TrySpawnObject"/>
     public event Action<Vector3, Quaternion> groundSpawned;
 
+
+    public event Action<GameObject> entityCreated;
+
     public bool isGroundSpawned = false;
 
     /// <summary>
@@ -266,12 +269,15 @@ public class ObjectSpawner : MonoBehaviour
             visualizationTrans.rotation = newObject.transform.rotation;
         }
 
-
-
         if(NetworkManager.Singleton.IsConnectedClient && GameObject.Find("ConjureKitManager") == null)
         {
             objectSpawned?.Invoke(spawnOptionIndex, spawnPoint, newObject.transform.rotation, NetworkManager.Singleton.LocalClientId);
             Destroy(newObject);
+        }
+
+        if (GameObject.Find("ConjureKitManager") != null)
+        {
+            entityCreated?.Invoke(newObject);
         }
         return true;
     }
@@ -324,6 +330,11 @@ public class ObjectSpawner : MonoBehaviour
         {
             groundSpawned?.Invoke(spawnPoint, newObject.transform.rotation);
             Destroy(newObject);
+        }
+
+        if(GameObject.Find("ConjureKitManager") != null)
+        {
+            entityCreated?.Invoke(newObject);
         }
         return true;
     }

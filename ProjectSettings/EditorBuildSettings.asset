@@ -5,13 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MenuScene.unity
     guid: c40c1c29b7257b54ebe52704316d2707
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ARFoundationBaseScene.unity
     guid: ea4a0ef910ea0a44aa0b80a01958f3f0
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/CloudAnchorScene.unity
     guid: 123724d51e307f34493f5b0ff69c6274
   - enabled: 1

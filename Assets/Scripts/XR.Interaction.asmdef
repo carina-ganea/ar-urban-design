@@ -1,0 +1,30 @@
+{
+    "name": "XR.Interaction",
+    "rootNamespace": "",
+    "references": [
+        "Unity.XR.Interaction.Toolkit",
+        "Unity.Netcode.Editor",
+        "Unity.Netcode.Runtime",
+        "Unity.Netcode.Components",
+        "Unity.XR.ARFoundation",
+        "Google.XR.ARCoreExtensions",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.XR.ARSubsystems",
+        "Unity.XR.CoreUtils",
+        "Unity.Collections",
+        "Unity.Mathematics",
+        "NativeGallery.Editor",
+        "NativeGallery.Runtime",
+        "Unity.XR.Interaction.Toolkit.Editor"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

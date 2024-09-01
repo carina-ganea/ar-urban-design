@@ -141,6 +141,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
 
         public event Action<ulong, ulong> objectSelected;
         public event Action<uint, Vector3, Quaternion> entitySelected;
+        public event Action<uint, Vector3> entityModified;
 
         /// <summary>
         /// See <see cref="MonoBehaviour"/>.
@@ -235,8 +236,20 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
 
                 if(obj.GetComponent<ConjureKitEntity>() != null)
                 {
-                    entitySelected?.Invoke(obj.GetComponent<ConjureKitEntity>().EntityID, obj.position, obj.rotation);
+                    if(Input.touchCount == 2)
+                    {
+                        //Rotation and scale are being modified
+                        entityModified?.Invoke(obj.GetComponent<ConjureKitEntity>().EntityID, obj.localScale);
+                        entitySelected?.Invoke(obj.GetComponent<ConjureKitEntity>().EntityID, obj.localPosition, obj.localRotation);
+                    }
+                    else if(Input.touchCount == 1)
+                    {
+                        // Position is being modified
+                        entitySelected?.Invoke(obj.GetComponent<ConjureKitEntity>().EntityID, obj.localPosition, obj.localRotation);
+                    }
                 }
+
+
                 
             }
 

@@ -47,6 +47,8 @@ public class ConjureKitManager : MonoBehaviour
     private Texture2D _videoTexture;
 
     private GameObject m_lastSelected;
+    private ObjectScale _objectScale;
+    private GameObject _ground;
     void Start()
     {
         //_graphHandler.SetCornerValues(new Vector2(-1, -1), new Vector2(500, 700));
@@ -70,6 +72,10 @@ public class ConjureKitManager : MonoBehaviour
         _conjureKit.OnJoined += session =>
         {
             sessionID.text = session.Id.ToString();
+
+            _objectScale = new ObjectScale(session);
+            session.RegisterSystem(_objectScale, () => Debug.Log("Scale System registered in session"));
+            _objectScale.OnScaleComponentUpdated += UpdateScale;
         };
 
         _conjureKit.OnLeft += state =>
@@ -81,6 +87,8 @@ public class ConjureKitManager : MonoBehaviour
 
         _conjureKit.OnEntityAdded += CreateCube;
 
+        m_objectSpawner.entityCreated += CreateCubeEntity;
+
         _conjureKit.OnEntityUpdatePose += UpdateLocalEntity;
 
         _conjureKit.OnEntityDeleted += DeleteLocalEntity;
@@ -91,7 +99,10 @@ public class ConjureKitManager : MonoBehaviour
 
         m_spawnTrigger.entitySelected += UpdateEntity;
 
+        m_spawnTrigger.entityModified += UpdateEntityScale;
+
         m_menuManager.deleteEntity += DeleteEntity;
+
     }
 
 
@@ -159,50 +170,61 @@ public class ConjureKitManager : MonoBehaviour
         _manna.SetLighthouseVisible( _qrCodeBool );
     }
 
-    public void CreateCubeEntity()
+    public void CreateCubeEntity(GameObject newObject)
     {
         if(_conjureKit.GetState() != State.Calibrated)
         {
             return;
         }
 
-        if( m_lastSelected)
+
+        if(_ground != null)
         {
-            Vector3 position = m_lastSelected.transform.localPosition;
-            Quaternion rotation = m_lastSelected.transform.localRotation;
-
-            Pose entityPose = new Pose(position, rotation);
-
-            foreach (var participant in GameObject.FindGameObjectsWithTag("Participant"))
-            {
-                Debug.Log("Participant: " + participant.GetComponent<NetworkObject>().OwnerClientId);
-                if (participant.GetComponent<NetworkParticipant>().IsOwner)
-                {
-                    Debug.Log("Participant: " + participant.GetComponent<NetworkParticipant>().NetworkBehaviourId.ToString());
-                    if(m_lastSelected.tag != "Ground")
-                    {
-                        participant.GetComponent<NetworkParticipant>().m_ObjectIndex.Value = int.Parse(m_lastSelected.transform.name.Substring(4, 1)) - 1;
-                    }
-                    else
-                    {
-                        m_lastSelected.transform.GetComponent<XRSimpleInteractable>().enabled = false;
-                    }
-                    
-                }
-            }
-
-            _conjureKit.GetSession().AddEntity(
-                entityPose,
-                onComplete: entity => HostSuccess(entity),
-                onError: error => Debug.Log(error)
-                );
+            newObject.transform.SetParent(_ground.transform, true);
         }
+
+        Vector3 position = newObject.transform.localPosition;
+        Quaternion rotation = newObject.transform.localRotation;
+
+        Pose entityPose = new Pose(position, rotation);
+
+        foreach (var participant in GameObject.FindGameObjectsWithTag("Participant"))
+        {
+            Debug.Log("Participant: " + participant.GetComponent<NetworkObject>().OwnerClientId);
+            if (participant.GetComponent<NetworkParticipant>().IsOwner)
+            {
+                Debug.Log("Participant: " + participant.GetComponent<NetworkParticipant>().NetworkBehaviourId.ToString());
+                if(newObject.tag != "Ground")
+                {
+                    entityPose = new Pose(position, rotation);
+
+                    participant.GetComponent<NetworkParticipant>().m_ObjectIndex.Value = int.Parse(newObject.transform.name.Substring(4, 1)) - 1;
+                }
+                else
+                {
+                    _ground = newObject;
+                    newObject.transform.GetComponent<XRSimpleInteractable>().enabled = false;
+                }
+                    
+            }
+        }
+
+        m_lastSelected = newObject;
+
+        _conjureKit.GetSession().AddEntity(
+            entityPose,
+            onComplete: entity => HostSuccess(entity),
+            onError: error => Debug.Log(error)
+            );
+        
 
     }
 
     private void HostSuccess(Entity entity)
     {
         Debug.Log("Successfully hosted entity");
+
+        _objectScale.SetScale(entity.Id, new Vector3(1,1,1));
 
         m_lastSelected.transform.GetComponent<ConjureKitEntity>().EntityID = entity.Id;
     }
@@ -235,6 +257,8 @@ public class ConjureKitManager : MonoBehaviour
             }
 
             var obj = Instantiate(m_objectSpawner.objectPrefabs[index], pose.position, pose.rotation);
+            obj.transform.SetParent(_ground.transform, true);
+            obj.transform.localScale = Vector3.one;
 
             obj.GetComponent<ConjureKitEntity>().EntityID = entity.Id;
             obj.GetComponent<ConjureKitEntity>().OwnerID = entity.ParticipantId;
@@ -242,6 +266,7 @@ public class ConjureKitManager : MonoBehaviour
         else
         {
             var obj = Instantiate(m_objectSpawner.m_GroundPrefab, pose.position, pose.rotation);
+            _ground = obj;
 
             m_objectSpawner.isGroundSpawned = true;
 
@@ -257,11 +282,38 @@ public class ConjureKitManager : MonoBehaviour
         _conjureKit.GetSession().SetEntityPose(id, new Pose(position, rotation));
     }
 
+    void UpdateEntityScale(uint id, Vector3 scale)
+    {
+        _objectScale.SetScale(id, scale);
+    }
+
+    void UpdateScale(uint entityId, Vector3 scale)
+    {
+        if(_ground == null)
+        {
+            return;
+        }
+
+        foreach (var obj in _ground.transform.GetComponentsInChildren<ConjureKitEntity>())
+        {
+            if (obj.EntityID == entityId)
+            {
+                obj.transform.localScale = scale;
+                break;
+            }
+        }
+    }
+
     void UpdateLocalEntity(Entity entity)
     {
         var pose = _conjureKit.GetSession().GetEntityPose(entity);
 
-        foreach(var obj in FindObjectsOfType<ConjureKitEntity>())
+        if(_ground == null)
+        {
+            return;
+        }
+
+        foreach(var obj in _ground.transform.GetComponentsInChildren<ConjureKitEntity>())
         {
             if(obj.EntityID == entity.Id)
             {
@@ -283,7 +335,7 @@ public class ConjureKitManager : MonoBehaviour
 
     void DeleteLocalEntity(uint id)
     {
-        foreach (var obj in FindObjectsOfType<ConjureKitEntity>())
+        foreach (var obj in _ground.transform.GetComponentsInChildren<ConjureKitEntity>())
         {
             if (obj.EntityID == id)
             {
